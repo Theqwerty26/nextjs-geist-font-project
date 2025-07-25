@@ -51,16 +51,18 @@ class Bonus_Shortcode {
 
         $query = new WP_Query( $args );
 
-        if ( ! $query->have_posts() ) {
-            return '<p>' . esc_html__( 'Bonus bulunamadı.', 'bonus-chat-bot' ) . '</p>';
-        }
-
         ob_start();
 
-        // Load admin settings for colors and fonts
-        $settings = get_option( 'bonus_chat_bot_settings' );
-        $background_color = isset( $settings['background_color'] ) ? esc_attr( $settings['background_color'] ) : '#0b1224';
-        $highlight_color = isset( $settings['highlight_color'] ) ? esc_attr( $settings['highlight_color'] ) : '#f7931e';
+        // Chatbot container with input field and bonus list container (hidden initially)
+        ?>
+        <div id="bonus-chatbot-container" style="background-color: <?php echo esc_attr( isset( $settings['background_color'] ) ? $settings['background_color'] : '#0b1224' ); ?>; color: #fff; padding: 1rem; width: 100%; max-width: 600px; border-radius: 10px; font-family: 'Exo', sans-serif; margin: 0 auto;">
+            <div id="chatbot-header" style="margin-bottom: 1rem;">
+                <h2 style="margin: 0; font-family: 'Exo', sans-serif;"><?php echo esc_html( isset( $settings['header_title'] ) ? $settings['header_title'] : 'Harika Önerilere Hoş Geldiniz' ); ?></h2>
+                <p style="margin: 0; font-family: 'Exo', sans-serif; font-size: 0.9rem;"><?php echo esc_html( isset( $settings['header_subtitle'] ) ? $settings['header_subtitle'] : 'Listeyi bana ver yazdığınızda listeyi görebilirsiniz' ); ?></p>
+            </div>
+            <input type="text" id="chatbot-input" placeholder="<?php esc_attr_e( 'Mesajınızı yazın...', 'bonus-chat-bot' ); ?>" style="width: 100%; padding: 0.5rem; border-radius: 5px; border: none; margin-bottom: 1rem;"/>
+            <div id="bonus-list-container" style="display: none;">
+        <?php
 
         // Template rendering
         switch ( $template ) {
@@ -75,6 +77,26 @@ class Bonus_Shortcode {
                 $this->render_vertical_list( $query->posts, $background_color, $highlight_color );
                 break;
         }
+
+        ?>
+            </div>
+        </div>
+        <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const input = document.getElementById('chatbot-input');
+            const bonusList = document.getElementById('bonus-list-container');
+            input.addEventListener('input', function() {
+                if (this.value.trim().toLowerCase() === 'listeyi ver') {
+                    bonusList.style.display = 'block';
+                    input.style.display = 'none';
+                } else {
+                    bonusList.style.display = 'none';
+                    input.style.display = 'block';
+                }
+            });
+        });
+        </script>
+        <?php
 
         wp_reset_postdata();
 
