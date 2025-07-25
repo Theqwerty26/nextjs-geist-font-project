@@ -37,10 +37,37 @@ class Bonus_Chat_Bot {
         wp_enqueue_style( 'bonus-chatbot-style', BONUS_CHAT_BOT_PLUGIN_URL . 'assets/css/chatbot.css', array(), BONUS_CHAT_BOT_VERSION );
         wp_enqueue_script( 'bonus-chatbot-script', BONUS_CHAT_BOT_PLUGIN_URL . 'assets/js/chatbot.js', array( 'jquery' ), BONUS_CHAT_BOT_VERSION, true );
 
-        // Localize script with AJAX URL and nonce
+        // Localize script with AJAX URL and nonce and pass admin settings for buttons and mobile fullscreen
+        $settings = get_option( 'bonus_chat_bot_settings' );
+        $buttons = array(
+            'telegram' => array(
+                'text' => isset( $settings['telegram_text'] ) ? $settings['telegram_text'] : 'Telegram',
+                'icon' => isset( $settings['telegram_icon'] ) ? $settings['telegram_icon'] : '',
+                'url'  => isset( $settings['telegram_url'] ) ? $settings['telegram_url'] : '',
+                'visible' => isset( $settings['telegram_visible'] ) ? boolval( $settings['telegram_visible'] ) : true,
+            ),
+            'whatsapp' => array(
+                'text' => isset( $settings['whatsapp_text'] ) ? $settings['whatsapp_text'] : 'WhatsApp',
+                'icon' => isset( $settings['whatsapp_icon'] ) ? $settings['whatsapp_icon'] : '',
+                'url'  => isset( $settings['whatsapp_url'] ) ? $settings['whatsapp_url'] : '',
+                'visible' => isset( $settings['whatsapp_visible'] ) ? boolval( $settings['whatsapp_visible'] ) : true,
+            ),
+            'reklam_ver' => array(
+                'text' => isset( $settings['reklam_ver_text'] ) ? $settings['reklam_ver_text'] : 'Reklam Ver',
+                'icon' => isset( $settings['reklam_ver_icon'] ) ? $settings['reklam_ver_icon'] : '',
+                'url'  => isset( $settings['reklam_ver_url'] ) ? $settings['reklam_ver_url'] : '',
+                'visible' => isset( $settings['reklam_ver_visible'] ) ? boolval( $settings['reklam_ver_visible'] ) : true,
+            ),
+            'order' => isset( $settings['button_order'] ) ? explode( ',', $settings['button_order'] ) : array( 'telegram', 'whatsapp', 'reklam_ver' ),
+        );
+
         wp_localize_script( 'bonus-chatbot-script', 'BonusChatBot', array(
             'ajax_url' => admin_url( 'admin-ajax.php' ),
             'nonce'    => wp_create_nonce( 'bonus_chat_bot_nonce' ),
+            'buttons'  => $buttons,
+            'mobile_fullscreen' => isset( $settings['mobile_fullscreen'] ) ? boolval( $settings['mobile_fullscreen'] ) : true,
+            'header_title' => 'Harika Önerilere Hoş Geldiniz',
+            'header_subtitle' => 'Listeyi bana ver yazdığınızda listeyi görebilirsiniz',
         ) );
     }
 
